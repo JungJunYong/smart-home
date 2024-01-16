@@ -4,6 +4,7 @@ import receiveMsg from "./src/kocom/receiveMsg";
 const sock = new net.Socket();
 const server = net.createServer(function(client){
     client.on('data', function(data){
+        console.log(client.localAddress, client.localPort, data.toString('hex'))
         const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
         msgList.forEach((msg) => {
             const msgType = getMsgType(msg)
