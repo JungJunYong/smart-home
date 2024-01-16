@@ -5,7 +5,7 @@ const sock = new net.Socket();
 const server = net.createServer(function(client){
     client.on('data', function(data){
         console.log(client.remoteAddress == '14.39.64.167',client.remoteAddress, client.remotePort, data.toString('hex'))
-        if(client.remoteAddress == '14.39.64.167'){
+        if(client.remoteAddress == '::ffff:14.39.64.167'){
             global.kocom = client;
                 console.log(client.remoteAddress, client.remotePort, data.toString('hex'))
             const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
