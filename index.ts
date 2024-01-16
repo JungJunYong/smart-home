@@ -4,10 +4,8 @@ import receiveMsg from "./src/kocom/receiveMsg";
 const sock = new net.Socket();
 const server = net.createServer(function(client){
     client.on('data', function(data){
-        console.log(client.remoteAddress == '14.39.64.167',client.remoteAddress, client.remotePort, data.toString('hex'))
-        if(client.remoteAddress == '::ffff:14.39.64.167'){
+        if(client.remoteAddress == '::ffff:14.39.64.167' && !global.kocom){
             global.kocom = client;
-                console.log(client.remoteAddress, client.remotePort, data.toString('hex'))
             const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
             msgList.forEach((msg) => {
                 const msgType = getMsgType(msg)
@@ -19,9 +17,8 @@ const server = net.createServer(function(client){
                         console.log('알수없는패킷',msg)
                 }
             })
-        }else{
+        }else if(client.remoteAddress != client.localAddress){
             global.kocom.emit('data',data)
-
         }
     })
 });
