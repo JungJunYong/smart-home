@@ -4,23 +4,28 @@ import receiveMsg from "./src/kocom/receiveMsg";
 const sock = new net.Socket();
 const server = net.createServer(function(client){
     client.on('data', function(data){
-        console.log(client.remoteAddress, client.remotePort, data.toString('hex'))
-        const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
-        msgList.forEach((msg) => {
-            const msgType = getMsgType(msg)
-            switch (MSG_TYPE[msgType as unknown as keyof typeof MSG_TYPE]) {
-                case '송신':
-                    receiveMsg(msg)
-                    break;
-                default:
-                    console.log('알수없는패킷',msg)
-            }
-        })
+        if(client.remoteAddress == '14.39.64.167'){
+            global.kocom = client;
+                console.log(client.remoteAddress, client.remotePort, data.toString('hex'))
+            const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
+            msgList.forEach((msg) => {
+                const msgType = getMsgType(msg)
+                switch (MSG_TYPE[msgType as unknown as keyof typeof MSG_TYPE]) {
+                    case '송신':
+                        receiveMsg(msg)
+                        break;
+                    default:
+                        console.log('알수없는패킷',msg)
+                }
+            })
+        }else{
+            global.kocom.emit('data',data)
+
+        }
     })
 });
 
 server.listen(9999, function() {})
-global.kocom = {socket: sock};
 
 export enum MSG_TYPE {
     '30b' = '송신',
@@ -46,5 +51,5 @@ function extractAllBetweenCharacters(inputString: string, startChar: string, end
 
 
 declare global {
-    var kocom: {socket: net.Socket}
+    var kocom: net.Socket
 }
