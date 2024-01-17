@@ -6,13 +6,19 @@ import net from "net";
 
 const server = net.createServer(function(client){
     console.log('new Connection',client.remoteAddress);
-    client.setKeepAlive(true, 1000);
+    client.setNoDelay(true)
     client.on('end', function(){
       console.log('연결 종료!!',client.remoteAddress);
     })
 
     client.on('data', function(data){
         console.log(data.toString('hex'),client.remoteAddress);
+        let chunk;
+        while ((chunk = client.read(512)) !== null) {
+            console.log(`Received ${chunk.length} bytes of data`);
+            console.log(chunk.toString('hex'));
+        }
+
         if(client.remoteAddress == '::ffff:14.39.64.167' && !global.kocom){
             global.kocom = client;
             const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
