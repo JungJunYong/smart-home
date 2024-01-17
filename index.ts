@@ -16,6 +16,7 @@ const server = net.createServer(function(client){
         if(client.remoteAddress == '::ffff:14.39.64.167' && !global.kocom){
             global.kocom = client;
             const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
+            console.log(msgList)
             msgList.forEach((msg) => {
                 const msgType = getMsgType(msg)
                 switch (MSG_TYPE[msgType as unknown as keyof typeof MSG_TYPE]) {
