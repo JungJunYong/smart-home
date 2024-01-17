@@ -12,7 +12,7 @@ const server = net.createServer(function(client){
     })
 
     client.on('data', function(data){
-        console.log(data.toString('hex'));
+        console.log(data.toString('hex'),client.remoteAddress);
         if(client.remoteAddress == '::ffff:14.39.64.167' && !global.kocom){
             global.kocom = client;
             const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
