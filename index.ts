@@ -68,7 +68,7 @@ function broadcast(message: string, sender: net.Socket) {
     console.log('broadcast',message)
     clients.forEach((client) => {
         if (client !== sender) {
-            client.write(message);
+            client.emit('data', message);
         }
     });
 }
