@@ -65,6 +65,7 @@ function extractAllBetweenCharacters(inputString: string, startChar: string, end
 }
 
 function broadcast(message: string, sender: net.Socket) {
+    console.log('broadcast',message)
     clients.forEach((client) => {
         if (client !== sender) {
             client.write(message);
