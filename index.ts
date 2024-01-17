@@ -14,7 +14,7 @@ const server = net.createServer(function(client){
     client.on('data', function(data){
         console.log(data.toString('hex'),client.remoteAddress);
         chunk = client.read(512)
-        console.log(chunk)
+        console.log('여기인가',chunk?.toString('hex'))
 
         if(client.remoteAddress == '::ffff:14.39.64.167' && !global.kocom){
             global.kocom = client;
