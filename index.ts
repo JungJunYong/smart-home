@@ -5,6 +5,12 @@ import net from "net";
 
 
 const server = net.createServer(function(client){
+    console.log('new Connection',client.remoteAddress);
+
+    client.on('end', function(){
+      console.log('연결 종료!!',client.remoteAddress);
+    })
+
     client.on('data', function(data){
         if(client.remoteAddress == '::ffff:14.39.64.167' && !global.kocom){
             global.kocom = client;
