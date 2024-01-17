@@ -2,27 +2,29 @@ import receiveMsg from "./src/kocom/receiveMsg";
 import net from "net";
 
 
-
+const clients: net.Socket[] = [];
 
 const server = net.createServer(function(client){
-    console.log('new Connection',client.remoteAddress);
-    if(!global.kocom && client.remoteAddress === client.localAddress){
+    console.log('new Connection',client.remoteAddress,client.localAddress);
+    if(!global.kocom && client.remoteAddress == '::ffff:14.39.64.167'){
         global.kocom = client;
     }
-
-    client.setNoDelay(true)
+    clients.push(client);
     client.on('end', function(){
       console.log('연결 종료!!',client.remoteAddress);
+        const index = clients.indexOf(client);
+        if (index !== -1) {
+            clients.splice(index, 1);
+        }
     })
     let chunk: string = '';
     let timer: NodeJS.Timeout;
     client.on('data', function(data){
-        console.log(data.toString('hex'),client.remoteAddress);
         chunk += data.toString('hex')
         if(timer) clearTimeout(timer);
         timer = setTimeout(()=>{
+            broadcast(chunk, client);
             const msgList = extractAllBetweenCharacters(chunk, 'aa55', '0d0d');
-            console.log(msgList)
             msgList.forEach((msg) => {
                 const msgType = getMsgType(msg)
                 switch (MSG_TYPE[msgType as unknown as keyof typeof MSG_TYPE]) {
@@ -62,7 +64,15 @@ function extractAllBetweenCharacters(inputString: string, startChar: string, end
     return matches.length > 0 ? matches : [];
 }
 
+function broadcast(message: string, sender: net.Socket) {
+    clients.forEach((client) => {
+        if (client !== sender) {
+            client.write(message);
+        }
+    });
+}
+
 
 declare global {
-    var kocom: net.Socket;
+    var kocom: net.Socket | undefined;
 }
