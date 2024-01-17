@@ -19,7 +19,7 @@ const status = {
 
 export default class Light implements DeviceIf {
     sendMsg(sendMsg: string) {
-        global.kocom.emit('data',sendMsg)
+        global.kocom?.emit('data',sendMsg)
     }
     searchMsg(msg: string) {
         console.log("Light receiveMsg");
