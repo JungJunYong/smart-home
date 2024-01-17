@@ -6,6 +6,10 @@ import net from "net";
 
 const server = net.createServer(function(client){
     console.log('new Connection',client.remoteAddress);
+    if(!global.kocom && client.remoteAddress === client.localAddress){
+        global.kocom = client;
+    }
+
     client.setNoDelay(true)
     client.on('end', function(){
       console.log('연결 종료!!',client.remoteAddress);
