@@ -12,7 +12,7 @@ const server = net.createServer(function(client) {
         timer = setTimeout(()=>{
             broadcast(chunk, client);
             chunk = '';
-        },500)
+        },800)
     })
 
     client.on('end', function(){
