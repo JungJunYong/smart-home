@@ -10,15 +10,14 @@ const server = net.createServer(function(client){
     client.on('end', function(){
       console.log('연결 종료!!',client.remoteAddress);
     })
-    let chunk;
+    let chunk: string = '';
+    let timer: NodeJS.Timeout;
     client.on('data', function(data){
         console.log(data.toString('hex'),client.remoteAddress);
-        chunk = client.read(512)
-        console.log('여기인가',chunk?.toString('hex'))
-
-        if(client.remoteAddress == '::ffff:14.39.64.167' && !global.kocom){
-            global.kocom = client;
-            const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
+        chunk += data.toString('hex')
+        if(timer) clearTimeout(timer);
+        timer = setTimeout(()=>{
+            const msgList = extractAllBetweenCharacters(chunk, 'aa55', '0d0d');
             console.log(msgList)
             msgList.forEach((msg) => {
                 const msgType = getMsgType(msg)
@@ -30,9 +29,8 @@ const server = net.createServer(function(client){
                         console.log('알수없는패킷',msg)
                 }
             })
-        }else if(client.remoteAddress === client.localAddress){
-            global.kocom.emit('data',data)
-        }
+            chunk = '';
+        },10)
     })
 });
 
