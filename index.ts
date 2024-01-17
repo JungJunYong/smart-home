@@ -30,7 +30,7 @@ const server = net.createServer(function(client){
                 }
             })
             chunk = '';
-        },10)
+        },500)
     })
 });
 
