@@ -6,7 +6,7 @@ import net from "net";
 
 const server = net.createServer(function(client){
     console.log('new Connection',client.remoteAddress);
-
+    client.setKeepAlive(true, 1000);
     client.on('end', function(){
       console.log('연결 종료!!',client.remoteAddress);
     })
