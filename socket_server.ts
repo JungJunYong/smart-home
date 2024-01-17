@@ -5,6 +5,7 @@ const clients: net.Socket[] = [];
 let timer: NodeJS.Timeout | undefined;
 let chunk: string = '';
 const server = net.createServer(function(client) {
+    console.log('신규 접속!!',client.remoteAddress);
     clients.push(client);
     client.on('data', function(data){
         chunk += data.toString('hex')
@@ -12,7 +13,7 @@ const server = net.createServer(function(client) {
         timer = setTimeout(()=>{
             broadcast(chunk, client);
             chunk = '';
-        },100)
+        },30)
     })
 
     client.on('end', function(){
