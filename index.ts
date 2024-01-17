@@ -65,10 +65,10 @@ function extractAllBetweenCharacters(inputString: string, startChar: string, end
 }
 
 function broadcast(message: string, sender: net.Socket) {
-    console.log('broadcast',message)
     clients.forEach((client) => {
         if (client !== sender) {
-            client.emit('data', message);
+            console.log('send',message)
+            client.write(message, 'hex');
         }
     });
 }
