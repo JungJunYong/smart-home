@@ -10,14 +10,11 @@ const server = net.createServer(function(client){
     client.on('end', function(){
       console.log('연결 종료!!',client.remoteAddress);
     })
-
+    let chunk;
     client.on('data', function(data){
         console.log(data.toString('hex'),client.remoteAddress);
-        let chunk;
-        while ((chunk = client.read(512)) !== null) {
-            console.log(`Received ${chunk.length} bytes of data`);
-            console.log(chunk.toString('hex'));
-        }
+        chunk = client.read(512)
+        console.log(chunk)
 
         if(client.remoteAddress == '::ffff:14.39.64.167' && !global.kocom){
             global.kocom = client;
