@@ -1,6 +1,7 @@
 import receiveMsg from "./src/kocom/receiveMsg";
 import net from "net";
 import dotenv from "dotenv";
+import {Mqtt} from "./src/mqtt";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ global.kocom = net.createConnection({host: serverHost, port: Number(serverPort)}
 })
 
 global.kocom.on('data', (data) => {
+    console.log(data.toString('hex'))
     const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
     msgList.forEach((msg) => {
         const msgType = getMsgType(msg)
@@ -24,6 +26,18 @@ global.kocom.on('data', (data) => {
                 console.log('알수없는패킷',msg)
         }
     })
+})
+
+const mqtt = Mqtt.getInstance()
+mqtt.onMessage((topic, message) => {
+    const regex =  /\/([^\/]+)\//;
+    const type = topic.match(regex)![1]!.split('_')[1];
+    const device = type?.replace(/\d/g,'');
+    switch (device) {
+        case 'light':
+
+    }
+    console.log(message)
 })
 
 
