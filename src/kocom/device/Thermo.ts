@@ -17,7 +17,7 @@ type PowerState_KEY = keyof typeof PowerState
 type RoomPacket_KEY = keyof typeof RoomPacket
 
 export default class Thermo implements DeviceIf {
-    sendMsg(sendMsg: string) {
+    sendMsg(topic:string,sendMsg: string) {
         console.log("Thermo sendMsg");
     }
 

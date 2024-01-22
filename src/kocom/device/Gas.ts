@@ -4,7 +4,7 @@ export default class Gas implements DeviceIf {
     receiveMsg (msg: string) {
         console.log("gas receiveMsg");
     }
-    sendMsg(sendMsg: string) {
+    sendMsg(topic:string,sendMsg: string) {
         console.log("sendMsg");
     }
     searchMsg(msg: string) {

@@ -8,7 +8,7 @@ enum FanState {
 }
 
 export default class Fan implements DeviceIf {
-    sendMsg(sendMsg: string) {
+    sendMsg(topic:string,sendMsg: string) {
         console.log("Fan sendMsg");
     }
     searchMsg(msg: string) {

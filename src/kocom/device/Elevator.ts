@@ -1,7 +1,7 @@
 import DeviceIf from "./DeviceIf";
 
 export default class Elevator implements DeviceIf {
-    sendMsg(sendMsg: string) {
+    sendMsg(topic:string,sendMsg: string) {
         console.log("sendMsg");
     }
     searchMsg(msg: string) {

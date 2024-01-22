@@ -3,6 +3,16 @@ import Gas from "./device/Gas";
 import Thermo from "./device/Thermo";
 import Fan from "./device/Fan";
 
+ const MSG_TYPE =  {
+    LIGHT : '0e',
+    GAS :'2c',
+    THERMO : '36',
+    AC :'39',
+    PLUG : '3b',
+    ELEVATOR : '44',
+    FAN : '48',
+}
+
 export enum MSG_DEVICE_TYPE {
     전등 = '0e',
     가스 = '2c',
@@ -23,9 +33,10 @@ const deviceInstance= new Map([
 export function identifyDeviceType(msg: string) {
     const deviceCode = msg.slice(10, 12)
     console.log('msg 들어옴!')
-    const deviceIntance = deviceInstance.get(deviceCode as MSG_DEVICE_TYPE);
-    if(deviceIntance){
-        deviceIntance.receiveMsg(msg)
+
+    const device = deviceInstance.get(deviceCode as MSG_DEVICE_TYPE);
+    if(device){
+        device.receiveMsg(msg)
     }else{
         console.log('정의된 메시지가 없습니다.',msg)
     }
@@ -33,6 +44,19 @@ export function identifyDeviceType(msg: string) {
 
 }
 
-export default function receiveMsg(msg: string) {
+export function receiveMsg(msg: string) {
     identifyDeviceType(msg)
+}
+
+export function receiveMqttMsg(topic: string, message: string) {
+    const regex =  /\/([^\/]+)\//;
+    const type = topic.match(regex)![1]!.split('_')[1];
+    const _device = type?.replace(/\d/g,'').toUpperCase();
+    const topiclist = topic.split('/')
+    const messageType = topiclist.pop()
+    const device = deviceInstance.get(MSG_TYPE[_device as keyof typeof MSG_TYPE] as MSG_DEVICE_TYPE);
+    if(messageType === 'set'){
+        device?.sendMsg(topic,message)
+    }
+
 }

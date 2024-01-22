@@ -21,23 +21,23 @@ export class Mqtt {
             //     console.log(topic, message.toString());
             // });
             this.client.subscribe('kocom/#');
-            const topic = 'homeassistant/light/kitchen_light01/config'
+            const topic = 'homeassistant/light/livingroom_light01/config'
             const payload = {
-                "name": "kocom/Kitchen",
-                "uniq_id": "kitchen_light01",
-                "cmd_t": "kocom/kitchen_light1/set",
-                "stat_t": "kocom/kitchen_light1/state",
+                "name": "kocom/livingroom",
+                "uniq_id": "livingroom_light01",
+                "cmd_t": "kocom/livingroom_light1/set",
+                "stat_t": "kocom/livingroom_light1/state",
                 "schema": "json",
                 "brightness": false
             }
             this.client.publish(topic, JSON.stringify(payload))
 
-            const topic2 = 'homeassistant/light/kitchen_light02/config'
+            const topic2 = 'homeassistant/light/livingroom_light02/config'
             const payload2 = {
-                "name": "kocom/Kitchen",
-                "uniq_id": "kitchen_light02",
-                "cmd_t": "kocom/kitchen_light2/set",
-                "stat_t": "kocom/kitchen_light2/state",
+                "name": "kocom/livingroom",
+                "uniq_id": "livingroom_light02",
+                "cmd_t": "kocom/livingroom_light2/set",
+                "stat_t": "kocom/livingroom_light2/state",
                 "schema": "json",
                 "brightness": false
             }
