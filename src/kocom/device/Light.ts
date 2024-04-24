@@ -45,11 +45,17 @@ export default class Light implements DeviceIf {
         console.log("Light receiveMsg");
     }
     receiveMsg(msg: string) {
-        const type =  msg.slice(4,8) as LIGTH_TYPE_KEY // 다른방이있는경우 로직추가 필요~
-        status.Light.room1 = msg.slice(16,18) == 'ff'
-        status.Light.room2 = msg.slice(18,20) == 'ff'
-        this.mqtt.publish('kocom/livingroom_light1/state', {state: status.Light.room1 ? 'ON' : 'OFF'})
-        this.mqtt.publish('kocom/livingroom_light2/state', {state: status.Light.room2 ? 'ON' : 'OFF'})
+        // const type =  msg.slice(4,8) as LIGTH_TYPE_KEY
+        const count = Number(process.env.LIGHT_COUNT ?? 0);
+        for(let i = 1;  i <= count; i++) {
+            {
+                const topic = `kocom/livingroom_light${i}/state`
+                const payload = {
+                    state: status.Light[`room${i}` as keyof typeof status.Light] ? 'ON' : 'OFF'
+                }
+                this.mqtt.publish(topic, payload)
+            }
+        }
     }
 
     createMessage(status: {room1: boolean, room2: boolean}){
