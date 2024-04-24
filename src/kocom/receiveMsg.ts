@@ -2,6 +2,8 @@ import Light from "./device/Light";
 import Gas from "./device/Gas";
 import Thermo from "./device/Thermo";
 import Fan from "./device/Fan";
+import Elevator from "./device/Elevator";
+import DeviceIf from "./device/DeviceIf";
 
  const MSG_TYPE =  {
     LIGHT : '0e',
@@ -22,21 +24,25 @@ export enum MSG_DEVICE_TYPE {
     엘리베이터 = '44',
     팬 = '48',
 }
-const deviceInstance= new Map([
+const deviceInstance= new Map<MSG_DEVICE_TYPE, DeviceIf>([
     [MSG_DEVICE_TYPE.전등, new Light()],
     [MSG_DEVICE_TYPE.가스, new Gas()],
     [MSG_DEVICE_TYPE.thermo, new Thermo()],
     [MSG_DEVICE_TYPE.팬, new Fan()],
+    [MSG_DEVICE_TYPE.엘리베이터, new Elevator()],
 ])
 
 
 export function identifyDeviceType(msg: string) {
-    const deviceCode = msg.slice(10, 12)
-    console.log('msg 들어옴!')
-
+    const deviceCode = msg.slice(10, 12);
+    const deviceCode2 = msg.slice(6,8);
     const device = deviceInstance.get(deviceCode as MSG_DEVICE_TYPE);
+    const device2 = deviceInstance.get(deviceCode2 as MSG_DEVICE_TYPE);
+
     if(device){
         device.receiveMsg(msg)
+    }else if(device2){
+        device2.receiveMsg(msg)
     }else{
         console.log('정의된 메시지가 없습니다.',msg)
     }

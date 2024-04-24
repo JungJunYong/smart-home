@@ -33,7 +33,6 @@ global.kocom.on('data', (data) => {
 const mqtt = Mqtt.getInstance()
 mqtt.onMessage((topic, message) => {
     receiveMqttMsg(topic, message)
-    console.log(message)
 })
 
 
