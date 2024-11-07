@@ -17,6 +17,7 @@ global.kocom.on('data', (data) => {
     const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
     msgList.forEach((msg) => {
         const msgType = getMsgType(msg)
+        console.log(MSG_TYPE[msgType as unknown as keyof typeof MSG_TYPE],msg)
         switch (MSG_TYPE[msgType as unknown as keyof typeof MSG_TYPE]) {
             case '송신':
                 receiveMsg(msg)
