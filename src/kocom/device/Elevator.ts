@@ -19,6 +19,7 @@ export default class Elevator implements DeviceIf {
     mqtt: Mqtt;
 
     sendMsg(topic: string, sendMsg: string) {
+        console.log('Calling elevator');
         const callMessage = "aa5530bc0001004400010000000000000000320d0d";
         global.kocom?.write(Buffer.from(callMessage, 'hex'));
         this.mqtt.publish('kocom/share_elevator/state', {state: 'ON'})
@@ -38,9 +39,13 @@ export default class Elevator implements DeviceIf {
                 const hex = msgList[4];
                 const floor = this.parseFloorCode(hex);
                 console.log('엘리베이터 층:', floor);
+                if(floor === '18층') {
+                    this.mqtt.publish('kocom/share_elevator/state', {state: 'OFF'});
+                }
                 this.mqtt.publish('kocom/share_elevator/status', {status: floor});
             }else if (msgList.length == 10 && msgList[6] === "0100") {
                 this.mqtt.publish('kocom/share_elevator/status', {status: 'NONE'});
+                this.mqtt.publish('kocom/share_elevator/state', {state: 'OFF'})
             }
         }
     }
