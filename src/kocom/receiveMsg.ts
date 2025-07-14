@@ -50,8 +50,12 @@ export function identifyDeviceType(msg: string) {
 
 }
 
-export function receiveMsg(msg: string) {
-    identifyDeviceType(msg)
+export function receiveMsg(msg: string,type: "kocom" | "network" = 'kocom') {
+     if(type === 'kocom'){
+         identifyDeviceType(msg)
+     }else{
+       deviceInstance.get(MSG_DEVICE_TYPE.엘리베이터)?.receiveMsg(msg)
+     }
 }
 
 export function receiveMqttMsg(topic: string, message: string) {

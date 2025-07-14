@@ -2,6 +2,7 @@ import {receiveMqttMsg, receiveMsg} from "./src/kocom/receiveMsg";
 import net from "net";
 import dotenv from "dotenv";
 import {Mqtt} from "./src/mqtt";
+import Elevator from "./src/kocom/device/Elevator";
 
 dotenv.config();
 
@@ -20,10 +21,10 @@ global.kocom.on('data', (data) => {
         console.log(MSG_TYPE[msgType as unknown as keyof typeof MSG_TYPE],msg)
         switch (MSG_TYPE[msgType as unknown as keyof typeof MSG_TYPE]) {
             case '송신':
-                receiveMsg(msg)
+                receiveMsg(msg,"kocom")
                 break;
             case '수신':
-                receiveMsg(msg)
+                receiveMsg(msg,"kocom")
                     break;
             default:
                 console.log('알수없는패킷',msg)
@@ -36,9 +37,8 @@ mqtt.onMessage((topic, message) => {
     if(topic.includes('kocom')){
         receiveMqttMsg(topic, message)
     }else if (topic.includes('network')){
-        // console.log('network topic', topic, message)
+        receiveMsg(message, 'network')
     }
-
 })
 
 
