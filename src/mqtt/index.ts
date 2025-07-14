@@ -16,9 +16,8 @@ export class Mqtt {
             username: process.env.MQTT_ID,
             password: process.env.MQTT_PW
         });
-        this.client.on('connect', () => {
-            this.client.subscribe('kocom/#');
-        })
+        this.client.subscribe('kocom/#');
+        this.client.subscribe("network/#")
     }
 
     public onMessage(callback: (topic: string, message: string) => void) {

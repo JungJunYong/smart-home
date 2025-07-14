@@ -1,4 +1,5 @@
 import DeviceIf from "./DeviceIf";
+import {Mqtt} from "../../mqtt";
 
 
 enum RoomPacket {
@@ -17,37 +18,36 @@ type PowerState_KEY = keyof typeof PowerState
 type RoomPacket_KEY = keyof typeof RoomPacket
 
 export default class Thermo implements DeviceIf {
+    mqtt: Mqtt;
+    constructor() {
+        this.mqtt = Mqtt.getInstance();
+        if(!this.mqtt.client.connected){
+
+        }
+    }
+
     sendMsg(topic:string,sendMsg: string) {
         console.log("Thermo sendMsg");
     }
 
     searchMsg(msg: string) {
+        global.kocom?.write(Buffer.from(msg, 'hex'));
         console.log("Thermo receiveMsg");
     }
 
-    getTemperture(msg: string) {
-        return parseInt(msg, 16);
-    }
-
     receiveMsg(msg: string) {
-        const room = msg.slice(12, 14) as RoomPacket_KEY
-        const power = msg.slice(14, 18) as PowerState_KEY
-        const temperture = this.getTemperture(msg.slice(18, 22));
-        const setTemperture = this.getTemperture(msg.slice(22, 26));
-        if (temperture === 266) {
-            console.log('온도 조절기 >>', RoomPacket[room], '외출 설정온도:', setTemperture)
-        } else {
-            console.log("온도 조절기 >>", RoomPacket[room], PowerState[power], '현재온도' + temperture,  '설정온도' + setTemperture, msg);
-        }
+        const hex = msg.match(/.{2}/g)!;
 
-        // console.log("Thermo receiveMsg",msg);
+        const comm = hex.slice(0, 2).join('');        // 송수신구분 (30bc: 송신, 30dc: 수신)
+        let roomId = hex[6];
+        const cmd = hex.slice(4, 6).join('');         // 명령/이벤트 코드
+        const powerStatus = hex[8] === '11'
+        const awayStatus  = hex[9] === '01' && powerStatus
 
-        // 30bc0001003600 0011 010a 0014 00000053 거실 전원 On 외출 On 현재온도 20도 설정온도 22도
-        // 30bc0001003601 0011 0016 0016 00000061 방 1 전원 On 외출 off 현재온도 22도 설정온도 22도
-        // 30bc0001003601 0011 010a 0016 00000056 방1 전원 On 외출 On 현재온도 22도 설정온도 22도
-        // 30bc0001003601 0000 010a 0016 00000045 방 1 전원 Off 외출 Off 현재온도 22도
-        // 30bc0001003602 0011 010a 0014 00000055 방 2 전원 On 외출 On 현재온도 20도 설정온도 20도
+        const curTemp     = parseInt(hex[13] + hex[12], 16);
+        const setTemp = parseInt(hex[11] + hex[10], 16);
 
+        console.log('온도 조절기 >>', RoomPacket[roomId as RoomPacket_KEY], "전원 상태:", powerStatus, "외출 모드:", awayStatus, "현재 온도:", curTemp, "설정 온도:", setTemp);
     }
 
 }

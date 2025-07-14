@@ -33,7 +33,12 @@ global.kocom.on('data', (data) => {
 
 const mqtt = Mqtt.getInstance()
 mqtt.onMessage((topic, message) => {
-    receiveMqttMsg(topic, message)
+    if(topic.includes('kocom')){
+        receiveMqttMsg(topic, message)
+    }else if (topic.includes('network')){
+        // console.log('network topic', topic, message)
+    }
+
 })
 
 

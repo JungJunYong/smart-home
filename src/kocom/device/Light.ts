@@ -26,10 +26,15 @@ export default class Light implements DeviceIf {
         this.mqtt = Mqtt.getInstance();
         if(!this.mqtt.client.connected){
             this.mqtt.client.on('connect', () => {
-                this.publish();
+                if(this.count === 0) {
+                    this.publish();
+                    this.count++;
+                }
+
             })
         }
     }
+    count = 0;
 
     mqtt: Mqtt;
 
@@ -66,11 +71,12 @@ export default class Light implements DeviceIf {
     publish(){
         const count = Number(process.env.LIGHT_COUNT ?? 0);
         for(let i = 1;  i <= count; i++) {
+            console.log(`livingroom_light0${i}`);
             {
                 const topic = `homeassistant/light/livingroom_light0${i}/config`
                 const payload = {
                     "name": "kocom/livingroom",
-                    "uniq_id": `livingroom_light0${i}}`,
+                    "uniq_id": `livingroom_light0${i}`,
                     "cmd_t": `kocom/livingroom_light${i}/set`,
                     "stat_t": `kocom/livingroom_light${i}/state`,
                     "schema": "json",
