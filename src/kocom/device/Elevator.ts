@@ -34,12 +34,13 @@ export default class Elevator implements DeviceIf {
             this.mqtt.publish('kocom/share_elevator/status', {status: 'NONE'})
         }else if(msg.includes('0x0050')){
             const msgList = msg.split(" ");
-            if(msgList.length === 9 && msgList[5] !== "0100"){
-                const hex = msgList[3].match(/.{2}/g)?.join()!;
+            console.log(msgList);
+            if(msgList.length === 9 && msgList[6] !== "0100"){
+                const hex = msgList[4];
                 const floor = this.parseFloorCode(hex);
                 console.log('엘리베이터 층:', floor);
                 this.mqtt.publish('kocom/share_elevator/status', {status: floor});
-            }else if (msgList.length == 9 && msgList[5] === "0100") {
+            }else if (msgList.length == 9 && msgList[6] === "0100") {
                 this.mqtt.publish('kocom/share_elevator/status', {status: 'NONE'});
             }
         }
