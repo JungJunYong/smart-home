@@ -39,6 +39,8 @@ export default class Elevator implements DeviceIf {
                 const floor = this.parseFloorCode(hex);
                 console.log('엘리베이터 층:', floor);
                 this.mqtt.publish('kocom/share_elevator/status', {status: floor});
+            }else if (msgList.length == 9 && msgList[5] === "0100") {
+                this.mqtt.publish('kocom/share_elevator/status', {status: 'NONE'});
             }
         }
     }
