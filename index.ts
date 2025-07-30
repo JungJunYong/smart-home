@@ -9,28 +9,49 @@ dotenv.config();
 // 연결할 서버 정보
 const serverHost = process.env.SERVER_HOST as string; // 서버 호스트
 const serverPort = Number(process.env.SERVER_PORT); // 서버 포트
+const INITIAL_RETRY_DELAY = 1000;
+const MAX_RETRY_DELAY = 60000;
 
-global.kocom = net.createConnection({host: serverHost, port: Number(serverPort)}, () => {
-  console.log('connected to server!');
-})
+function connectWithRetry(retryDelay = INITIAL_RETRY_DELAY) {
+    global.kocom = net.createConnection({host: serverHost, port: Number(serverPort)}, () => {
+        console.log(`Successfully connected to server at ${serverHost}:${serverPort}`);
+    });
 
-global.kocom.on('data', (data) => {
-    const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
-    msgList.forEach((msg) => {
-        const msgType = getMsgType(msg)
-        console.log(MSG_TYPE[msgType as unknown as keyof typeof MSG_TYPE],msg)
-        switch (MSG_TYPE[msgType as unknown as keyof typeof MSG_TYPE]) {
-            case '송신':
-                receiveMsg(msg,"kocom")
-                break;
-            case '수신':
-                receiveMsg(msg,"kocom")
-                    break;
-            default:
-                console.log('알수없는패킷',msg)
+    global.kocom.on('error', (err) => {
+        console.error('Connection error occurred:', err.message);
+        console.error('Error details:', err);
+    });
+
+    global.kocom.on('close', () => {
+        const nextDelay = Math.min(retryDelay * 2, MAX_RETRY_DELAY);
+        console.log(`Connection closed. Attempting reconnection in ${retryDelay / 1000} seconds...`);
+        setTimeout(() => connectWithRetry(nextDelay), retryDelay);
+    });
+
+    global.kocom.on('data', (data) => {
+        try {
+            const msgList = extractAllBetweenCharacters(data.toString('hex'), 'aa55', '0d0d');
+            msgList.forEach((msg) => {
+                const msgType = getMsgType(msg)
+                console.log(MSG_TYPE[msgType as unknown as keyof typeof MSG_TYPE], msg)
+                switch (MSG_TYPE[msgType as unknown as keyof typeof MSG_TYPE]) {
+                    case '송신':
+                        receiveMsg(msg, "kocom")
+                        break;
+                    case '수신':
+                        receiveMsg(msg, "kocom")
+                        break;
+                    default:
+                        console.log('Unknown packet received:', msg)
+                }
+            })
+        } catch (error) {
+            console.error('Error processing received data:', error);
         }
-    })
-})
+    });
+}
+
+connectWithRetry();
 
 const mqtt = Mqtt.getInstance()
 mqtt.onMessage((topic, message) => {
